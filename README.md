@@ -34,5 +34,3 @@ Once the MCP server is connected, you can ask the AI assistant to share files:
 - "Generate a download link for ./presentation.pptx"
 
 The tool will upload the file and return a shareable link like `https://file.kiwi/abcdef12#hashashahshashhashhash`.
-
-
