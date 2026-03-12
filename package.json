@@ -1,0 +1,16 @@
+{
+  "name": "filekiwi-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server to upload files to file.kiwi via Playwright",
+  "type": "module",
+  "bin": {
+    "filekiwi-mcp-server": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.1",
+    "playwright": "^1.49.0"
+  }
+}
