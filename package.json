@@ -1,16 +1,19 @@
 {
-  "name": "filekiwi-mcp-server",
+  "name": "@file-kiwi/filekiwi-mcp-server",
   "version": "1.0.0",
-  "description": "MCP server to upload files to file.kiwi via Playwright",
+  "description": "FileKiwi MCP Server for Claude and other AI agents",
+  "main": "index.js",
   "type": "module",
   "bin": {
-    "filekiwi-mcp-server": "./index.js"
+    "filekiwi-mcp": "./index.js"
   },
-  "scripts": {
-    "start": "node index.js"
-  },
+  "files": [
+    "index.js"
+  ],
+  "scripts": {},
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.1",
-    "playwright": "^1.49.0"
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "playwright": "^1.40.0",
+    "zod": "^3.22.0"
   }
 }

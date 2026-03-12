@@ -1,58 +1,52 @@
 #!/usr/bin/env node
 
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import { z } from "zod";
 import { chromium } from "playwright";
 
-const server = new Server({
+const server = new McpServer({
   name: "filekiwi-mcp-server",
   version: "1.0.0",
-}, {
-  capabilities: { tools: {} },
 });
 
-server.setRequestHandler(ListToolsRequestSchema, async () => ({
-  tools: [{
-    name: "upload_to_kiwi",
-    description: "사용자가 파일 링크 생성이나 공유를 요청할 때 실행합니다. file.kiwi에 파일을 업로드하고 공유 URL을 반환합니다.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        filePath: { type: "string", description: "업로드할 파일의 절대 경로" },
-      },
-      required: ["filePath"],
-    },
-  }],
-}));
+server.tool(
+  "upload_to_kiwi",
+  "Upload files to file.kiwi and return the share URL.",
+  { filePaths: z.array(z.string()).describe("Absolute paths of files to upload (no folders)") },
+  async ({ filePaths }) => {
+    const browser = await chromium.launch({channel: 'chrome', headless: false});
+    try {
+      const context = await browser.newContext();
+      const page = await context.newPage();
+      await page.goto("https://file.kiwi/#cli", { waitUntil: "networkidle" });
 
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  if (request.params.name !== "upload_to_kiwi") throw new Error("Unknown tool");
+      // Wait for SvelteKit hydration, then inject file into hidden input
+      const fileInput = page.locator('input[type="file"]').first();
+      await fileInput.waitFor({ state: 'attached', timeout: 15000 });
+      await fileInput.setInputFiles(filePaths);
 
-  const browser = await chromium.launch({ headless: true });
-  try {
-    const context = await browser.newContext();
-    const page = await context.newPage();
-    await page.goto("https://file.kiwi/");
+      // Wait for share link to appear
+      const shareLinkEl = await page.waitForSelector('#share_link', { timeout: 60000 });
+      const shareLink = await shareLinkEl.textContent();
 
-    // 파일 업로드 (input 태그에 경로 주입)
-    await page.setInputFiles('input[type="file"]', request.params.arguments.filePath);
+      // Wait for "Upload Complete" then navigate to the share link
+      await page.waitForSelector('text=Upload Complete', { timeout: 120000 });
+      await page.goto(shareLink.trim());
 
-    // 업로드 완료 대기 (URL에 고유 해시 코드가 생길 때까지 대기)
-    await page.waitForURL(url => url.hash.length > 5, { timeout: 60000 });
-
-    return {
-      content: [{ type: "text", text: `성공! 파일 링크: ${page.url()}` }],
-    };
-  } catch (error) {
-    return {
-      isError: true,
-      content: [{ type: "text", text: `오류 발생: ${error.message}` }],
-    };
-  } finally {
-    await browser.close();
+      return {
+        content: [{ type: "text", text: `Success! Share link: ${shareLink.trim()}` }],
+      };
+    } catch (error) {
+      return {
+        isError: true,
+        content: [{ type: "text", text: `Error: ${error.message}` }],
+      };
+    } finally {
+      // Browser stays open, navigated to share link
+    }
   }
-});
+);
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
