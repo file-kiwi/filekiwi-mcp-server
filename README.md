@@ -5,34 +5,10 @@ Model Context Protocol (MCP) server for simple and instant file sharing.
 
 ## Features
 
-- `upload_to_kiwi` tool: file.kiwi에 파일을 업로드하고 공유 URL을 반환합니다.
-- Playwright 기반 headless Chrome으로 자동 업로드
+- `upload_to_kiwi` tool: Uploads a file to [file.kiwi](https://file.kiwi) and returns a shareable URL.
+- Automated upload via headless Chrome powered by Playwright.
 
 ## Setup
-
-```bash
-npm install
-npx playwright install chromium
-```
-
-## Usage
-
-### Claude Desktop / MCP Client 설정
-
-`claude_desktop_config.json`에 추가:
-
-```json
-{
-  "mcpServers": {
-    "filekiwi": {
-      "command": "node",
-      "args": ["/absolute/path/to/index.js"]
-    }
-  }
-}
-```
-
-### npx로 사용 (npm 배포 후)
 
 ```json
 {
@@ -44,3 +20,13 @@ npx playwright install chromium
   }
 }
 ```
+
+## Usage
+
+Once the MCP server is connected, you can ask the AI assistant to share files:
+
+- "Share this file: C:\Users\me\report.pdf"
+- "Upload /home/user/photo.png to file.kiwi"
+- "Generate a download link for ./presentation.pptx"
+
+The tool will upload the file and return a shareable link like `https://file.kiwi/#abcdef`.
