@@ -19,7 +19,7 @@ Model Context Protocol (MCP) server for simple and instant file sharing.
   "mcpServers": {
     "filekiwi": {
       "command": "npx",
-      "args": ["-y", "filekiwi-mcp-server"]
+      "args": ["-y", "@file-kiwi/filekiwi-mcp-server"]
     }
   }
 }
