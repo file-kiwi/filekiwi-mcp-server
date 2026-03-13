@@ -12,8 +12,8 @@ const server = new McpServer({
 
 server.tool(
   "upload_to_kiwi",
-  "Upload files to file.kiwi and return the share URL.",
-  { filePaths: z.array(z.string()).describe("Absolute paths of files to upload (no folders)") },
+  "Upload files to file.kiwi and return the share URL. IMPORTANT: Only real file system paths work (e.g. C:\\Users\\username\\Desktop\\file.png). Paths like /mnt/user-data/uploads/ or /home/claude/ are virtual and will fail. Ask the user for the actual local file path on their computer.",
+  { filePaths: z.array(z.string()).describe("Absolute local file system paths on the user's computer (e.g. C:\\Users\\username\\file.png). Do NOT use virtual paths like /mnt/user-data/uploads/ — ask the user for the real path.") },
   async ({ filePaths }) => {
     const browser = await chromium.launch({channel: 'chrome', headless: false});
     try {
@@ -26,16 +26,17 @@ server.tool(
       await fileInput.waitFor({ state: 'attached', timeout: 15000 });
       await fileInput.setInputFiles(filePaths);
 
-      // Wait for share link to appear
+      // Return share link immediately once it appears
       const shareLinkEl = await page.waitForSelector('#share_link', { timeout: 60000 });
       const shareLink = await shareLinkEl.textContent();
 
-      // Wait for "Upload Complete" then navigate to the share link
-      await page.waitForSelector('text=Upload Complete', { timeout: 120000 });
-      await page.goto(shareLink.trim());
+      // Continue watching in background: navigate to share link when upload completes
+      page.waitForSelector('text=Upload Complete', { timeout: 120000 })
+        .then(() => page.goto(shareLink.trim()))
+        .catch(() => {});
 
       return {
-        content: [{ type: "text", text: `Success! Share link: ${shareLink.trim()}` }],
+        content: [{ type: "text", text: `Share link: ${shareLink.trim()}` }],
       };
     } catch (error) {
       return {
