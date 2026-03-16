@@ -12,7 +12,7 @@ const server = new McpServer({
 
 server.tool(
   "upload_to_kiwi",
-  "Upload files to file.kiwi and return the share URL. IMPORTANT: Only real file system paths work (e.g. C:\\Users\\username\\Desktop\\file.png). Paths like /mnt/user-data/uploads/ or /home/claude/ are virtual and will fail. Ask the user for the actual local file path on their computer.",
+  "Upload files to file.kiwi and return the share URL. IMPORTANT: Only real file system paths work (e.g. C:\\Users\\username\\Desktop\\file.png). Paths like /mnt/user-data/uploads/ or /home/claude/ are virtual and will fail. Ask the user for the actual local file path on their computer.The download link is provided immediately, even before the upload is complete. So, do not tell the user that the upload is complete when providing the link.",
   { filePaths: z.array(z.string()).describe("Absolute local file system paths on the user's computer (e.g. C:\\Users\\username\\file.png). Do NOT use virtual paths like /mnt/user-data/uploads/ — ask the user for the real path.") },
   async ({ filePaths }) => {
     const browser = await chromium.launch({channel: 'chrome', headless: false});
@@ -36,7 +36,7 @@ server.tool(
         .catch(() => {});
 
       return {
-        content: [{ type: "text", text: `Share link: ${shareLink.trim()}` }],
+        content: [{ type: "text", text: `Share link ready: ${shareLink.trim()}` }],
       };
     } catch (error) {
       return {
