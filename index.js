@@ -49,5 +49,32 @@ server.tool(
   }
 );
 
-const transport = new StdioServerTransport();
-await server.connect(transport);
+// CLI mode: node index.js <file1> [file2] ...
+const args = process.argv.slice(2);
+if (args.length > 0) {
+  const browser = await chromium.launch({ channel: 'chrome', headless: false });
+  try {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await page.goto("https://file.kiwi/#cli", { waitUntil: "networkidle" });
+
+    const fileInput = page.locator('input[type="file"]').first();
+    await fileInput.waitFor({ state: 'attached', timeout: 15000 });
+    await fileInput.setInputFiles(args);
+
+    const shareLinkEl = await page.waitForSelector('#share_link', { timeout: 60000 });
+    const shareLink = await shareLinkEl.textContent();
+
+    console.log(shareLink.trim());
+
+    page.waitForSelector('text=Upload Complete', { timeout: 120000 })
+      .then(() => page.goto(shareLink.trim()))
+      .catch(() => {});
+  } catch (error) {
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
+  }
+} else {
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
+}

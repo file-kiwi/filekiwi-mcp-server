@@ -1,6 +1,6 @@
 {
   "name": "@file-kiwi/filekiwi-mcp-server",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "FileKiwi MCP Server for Claude and other AI agents",
   "main": "index.js",
   "type": "module",
