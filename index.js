@@ -10,7 +10,7 @@ const server = new McpServer({
   version: "1.0.0",
 });
 
-server.tool(
+server.registerTool(
   "upload_to_kiwi",
   "Upload files to file.kiwi and return the share URL. IMPORTANT: Only real file system paths work (e.g. C:\\Users\\username\\Desktop\\file.png). Paths like /mnt/user-data/uploads/ or /home/claude/ are virtual and will fail. Ask the user for the actual local file path on their computer.The download link is provided immediately, even before the upload is complete. So, do not tell the user that the upload is complete when providing the link.",
   { filePaths: z.array(z.string()).describe("Absolute local file system paths on the user's computer (e.g. C:\\Users\\username\\file.png). Do NOT use virtual paths like /mnt/user-data/uploads/ — ask the user for the real path.") },
@@ -23,16 +23,18 @@ server.tool(
 
       // Wait for SvelteKit hydration, then inject file into hidden input
       const fileInput = page.locator('input[type="file"]').first();
-      await fileInput.waitFor({ state: 'attached', timeout: 15000 });
+      await fileInput.waitFor({ state: 'attached', timeout: 10000 });
+      await page.waitForTimeout(1000);
       await fileInput.setInputFiles(filePaths);
+   
 
       // Return share link immediately once it appears
       const shareLinkEl = await page.waitForSelector('#share_link', { timeout: 60000 });
       const shareLink = await shareLinkEl.textContent();
 
       // Continue watching in background: navigate to share link when upload completes
-      page.waitForSelector('text=Upload Complete', { timeout: 120000 })
-        .then(() => page.goto(shareLink.trim()))
+      page.waitForSelector('text=Upload Complete')
+        .then(() => page.close())
         .catch(() => {});
 
       return {
@@ -59,16 +61,19 @@ if (args.length > 0) {
     await page.goto("https://file.kiwi/#cli", { waitUntil: "networkidle" });
 
     const fileInput = page.locator('input[type="file"]').first();
-    await fileInput.waitFor({ state: 'attached', timeout: 15000 });
+    await fileInput.waitFor({ state: 'attached', timeout: 10000 });
+   
+    await page.waitForTimeout(1000);
     await fileInput.setInputFiles(args);
 
     const shareLinkEl = await page.waitForSelector('#share_link', { timeout: 60000 });
     const shareLink = await shareLinkEl.textContent();
 
+     console.log("Upload started. Share link ready:")
     console.log(shareLink.trim());
 
-    page.waitForSelector('text=Upload Complete', { timeout: 120000 })
-      .then(() => page.goto(shareLink.trim()))
+    page.waitForSelector('text=Upload Complete')
+      .then(() => {page.close(); console.log("Upload complete");process.exit(0);})
       .catch(() => {});
   } catch (error) {
     console.error(`Error: ${error.message}`);

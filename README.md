@@ -1,7 +1,7 @@
 # filekiwi-mcp-server
 
 Model Context Protocol (MCP) server for simple and instant file sharing.  
-**Input**: file name → **Output**: download link
+**Input**: file name → **Output**: download link in **Seconds** even for **large file**
 
 ## Features
 
@@ -11,8 +11,24 @@ Model Context Protocol (MCP) server for simple and instant file sharing.
 - Download link available immediately after file input (downloads proceed even while upload is still in progress)
 - Free download period with automatic file deletion [details](https://file.kiwi/price)
 
+## Usage
+
+Once the MCP server is connected, you can ask the AI assistant to share files:
+
+- "Share this file: C:\Users\me\report.pdf"
+- "Upload /home/user/photo.png to file.kiwi"
+- "Generate a download link for ./presentation.pptx"
+
+The tool will upload the file and return a shareable link like `https://file.kiwi/abcdef12#hashashahshashhashhash`.
+
 
 ## Setup
+
+### Test before use
+
+```bash
+npx -y @file-kiwi/filekiwi-mcp-server "C:\User\your_file.ext"
+```
 
 ### Claude Code (CLI)
 
@@ -52,12 +68,16 @@ Some environments (e.g. Claude Desktop) restrict local file system access by def
 }
 ```
 
-## Usage
+### FAQ
 
-Once the MCP server is connected, you can ask the AI assistant to share files:
+#### Why not headless mode?
+If the upload fails, this is to allow the user to retry directly in the browser. file.kiwi supports resumable uploads.
 
-- "Share this file: C:\Users\me\report.pdf"
-- "Upload /home/user/photo.png to file.kiwi"
-- "Generate a download link for ./presentation.pptx"
+#### NO AUTHENTICATION or API KEY required?
+No. Not at all. 
 
-The tool will upload the file and return a shareable link like `https://file.kiwi/abcdef12#hashashahshashhashhash`.
+#### File deletion
+Files are automatically deleted in 90 hours after upload.
+
+#### Is it free?
+Yes, it is free for any size of files. But, There is free download period for each file. [details](https://file.kiwi/price)
