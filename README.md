@@ -3,6 +3,8 @@
 Model Context Protocol (MCP) server for simple and instant file sharing.  
 **Input**: file name → **Output**: download link in **Seconds** even for **large file**
 
+[![filekiwi-mcp-server MCP server](https://glama.ai/mcp/servers/file-kiwi/filekiwi-mcp-server/badges/card.svg)](https://glama.ai/mcp/servers/file-kiwi/filekiwi-mcp-server)
+
 ## Features
 
 - `upload_to_kiwi` tool: Uploads files to [file.kiwi](https://file.kiwi) and returns a shareable URL.
