@@ -1,7 +1,7 @@
 {
   "name": "@file-kiwi/filekiwi-mcp-server",
   "mcpName": "io.github.file-kiwi/filekiwi-mcp-server",
-  "version": "1.0.10",
+  "version": "2.0.0",
   "description": "FileKiwi MCP Server for Claude and other AI agents",
   "main": "index.js",
   "type": "module",
@@ -28,8 +28,8 @@
   "homepage": "https://file.kiwi",
   "scripts": {},
   "dependencies": {
+    "@file-kiwi/node": "^1.0.6",
     "@modelcontextprotocol/sdk": "^1.0.0",
-    "playwright": "^1.40.0",
     "zod": "^4.0.0"
   }
 }

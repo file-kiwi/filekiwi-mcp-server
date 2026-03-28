@@ -1,15 +1,16 @@
 # filekiwi-mcp-server
 
-Model Context Protocol (MCP) server for simple and instant file sharing.  
-**Input**: file name → **Output**: download link in **Seconds** even for **large file**
+Model Context Protocol (MCP) server for simple and instant file sharing.
+**Input**: file path → **Output**: download link in **seconds** even for **large files**
 
 ## Features
 
 - `upload_to_kiwi` tool: Uploads files to [file.kiwi](https://file.kiwi) and returns a shareable URL.
-- Automated upload via headless Chrome powered by Playwright.
+- E2E encrypted upload via [file.kiwi API](https://file.kiwi/api)
+- No browser required — pure Node.js
 - No file size limit
-- Download link available immediately after file input (downloads proceed even while upload is still in progress)
-- Free download period with automatic file deletion [details](https://file.kiwi/price)
+- Download link available immediately (downloads proceed even while upload is still in progress)
+- Free download period with automatic file deletion — [details](https://file.kiwi/api)
 
 ## Usage
 
@@ -19,7 +20,7 @@ Once the MCP server is connected, you can ask the AI assistant to share files:
 - "Upload /home/user/photo.png to file.kiwi"
 - "Generate a download link for ./presentation.pptx"
 
-The tool will upload the file and return a shareable link like `https://file.kiwi/abcdef12#hashashahshashhashhash`.
+The tool will upload the file and return a shareable link like `https://file.kiwi/abcdef12#secretKey`.
 
 
 ## Setup
@@ -70,14 +71,11 @@ Some environments (e.g. Claude Desktop) restrict local file system access by def
 
 ### FAQ
 
-#### Why not headless mode?
-If the upload fails, this is to allow the user to retry directly in the browser. file.kiwi supports resumable uploads.
-
 #### NO AUTHENTICATION or API KEY required?
-No. Not at all. 
+No. Not at all.
 
 #### File deletion
-Files are automatically deleted in 90 hours after upload.
+Files are automatically deleted after 90 hours. See [API docs](https://file.kiwi/api) for details.
 
 #### Is it free?
-Yes, it is free for any size of files. But, There is free download period for each file. [details](https://file.kiwi/price)
+Yes, free for any size. There is a free download period per file — see [API docs](https://file.kiwi/api).
